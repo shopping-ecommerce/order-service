@@ -1,0 +1,49 @@
+server:
+  port: 8086
+  servlet:
+    context-path: /order
+
+spring:
+  datasource:
+    url: ${DBMS_CONNECTION:jdbc:mariadb://mariadb:3306/order_db}
+    driver-class-name: "org.mariadb.jdbc.Driver"
+    username: ${DBMS_USERNAME:root}
+    password: ${DBMS_PASSWORD:sapassword}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  kafka:
+    bootstrap-servers: ${DBKK_CONNECTION:kafka}:9094
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 60000
+            read-timeout: 120000
+          auth-service:
+            url: ${FEIGN_AUTH:http://auth-service:8080}
+            connect-timeout: 30000
+            read-timeout: 60000
+          product-service:
+            url: ${FEIGN_PRODUCT:http://product-service:8083/product}
+            connect-timeout: 30000
+            read-timeout: 60000
+          user-service:
+            url: ${FEIGN_USER:http://user-service:8082/info}
+            connect-timeout: 30000
+            read-timeout: 60000
+
+logging:
+  level:
+    iuh.fit.se.service.impl: DEBUG
+    iuh.fit.se.repository.httpclient: DEBUG  # Log Feign clients
+    feign: DEBUG  # Enable Feign logging
+    org.springframework.web: INFO
+    org.springframework.cloud.openfeign: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

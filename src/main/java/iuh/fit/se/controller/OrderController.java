@@ -2,6 +2,7 @@ package iuh.fit.se.controller;
 
 import iuh.fit.se.dto.request.OrderRequest;
 import iuh.fit.se.dto.request.SellerOrderUpdateRequest;
+import iuh.fit.se.dto.request.UserCancelRequest;
 import iuh.fit.se.dto.response.ApiResponse;
 import iuh.fit.se.dto.response.OrderResponse;
 import iuh.fit.se.service.OrderService;
@@ -36,12 +37,12 @@ public class OrderController {
                 .build();
     }
 
-    @PostMapping("/cancelOrder/{orderId}")
-    public ApiResponse<OrderResponse> cancelOrder(@PathVariable String orderId, @RequestParam String userId) {
-        log.info("Cancelling order: {} for user: {}", orderId, userId);
+    @PostMapping("/cancelOrder")
+    public ApiResponse<OrderResponse> cancelOrder(@RequestBody UserCancelRequest request) {
+        log.info("Cancelling order: {} for user: {}", request.getOrderId(), request.getUserId());
         return ApiResponse.<OrderResponse>builder()
                 .message("Order cancelled successfully")
-                .result(orderService.cancelOrderByUser(orderId, userId))
+                .result(orderService.cancelOrderByUser(request))
                 .build();
     }
 }

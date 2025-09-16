@@ -6,6 +6,7 @@ import iuh.fit.event.dto.OrderStatusChangedEvent;
 import iuh.fit.se.dto.request.OrderRequest;
 import iuh.fit.se.dto.request.SearchSizeAndIDRequest;
 import iuh.fit.se.dto.request.SellerOrderUpdateRequest;
+import iuh.fit.se.dto.request.UserCancelRequest;
 import iuh.fit.se.dto.response.*;
 import iuh.fit.se.entity.Order;
 import iuh.fit.se.entity.OrderItem;
@@ -120,19 +121,40 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public OrderResponse cancelOrderByUser(String orderId, String userId) {
-        Order order = findOrderById(orderId);
+    public OrderResponse cancelOrderByUser(UserCancelRequest request) {
+        Order order = findOrderById(request.getOrderId());
         // Validate user owns this order
-        if (!order.getUserId().equals(userId)) {
+        if (!order.getUserId().equals(request.getUserId())) {
             throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
-
+        ApiResponse<SellerResponse> sellerInfo = userClient.searchBySellerId(order.getSellerId());
+        log.info("seller info: {}", sellerInfo.getResult());
+        kafkaTemplate.send("user-cancel-order", OrderStatusChangedEvent.builder()
+                .orderId(order.getId())
+                .userEmail(sellerInfo.getResult().getEmail())
+                .userId(order.getUserId())
+                .reason(request.getReason())
+                .shippingAddress(order.getShippingAddress())
+                .recipientName(order.getRecipientName())
+                .status(OrderStatusEnum.CANCELLED.toString())
+                .sellerId(order.getSellerId())
+                .items(order.getOrderItems().stream().map(i -> OrderItemPayload.builder()
+                        .productId(i.getProductId())
+                        .size(i.getSize())
+                        .quantity(i.getQuantity())
+                        .productName(i.getProductName())
+                        .subTotal(i.getTotalPrice())
+                        .unitPrice(i.getUnitPrice())
+                        .build()).toList())
+                .subtotal(order.getSubtotal())
+                .build());
         // Only allow cancellation if order is PENDING
         if (order.getStatus() != OrderStatusEnum.PENDING) {
             throw new AppException(ErrorCode.ORDER_CANNOT_BE_CANCELLED);
         }
 
         order.setStatus(OrderStatusEnum.CANCELLED);
+        order.setCancelledReason(request.getReason());
         Order savedOrder = orderRepository.save(order);
         return orderMapper.toOrderResponse(savedOrder);
     }

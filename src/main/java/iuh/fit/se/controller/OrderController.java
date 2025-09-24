@@ -54,7 +54,7 @@ public class OrderController {
         log.info("Getting order by ID: {}", orderId);
         return ApiResponse.<OrderResponse>builder()
                 .message("Order fetched successfully")
-                .result(orderService.findOrderById(orderId))
+                .result(orderService.getOrderById(orderId))
                 .build();
     }
 

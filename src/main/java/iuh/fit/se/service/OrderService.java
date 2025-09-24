@@ -11,7 +11,8 @@ public interface OrderService {
     OrderResponse cancelOrderByUser(UserCancelRequest request);
 
     OrderResponse updateOrderBySeller(SellerOrderUpdateRequest request);
-    OrderResponse findOrderById(String orderId);
+
+    OrderResponse getOrderById(String orderId);
 
     List<OrderResponse> getOrdersByUserId(String userId, List<OrderStatusEnum> statuses);
     List<OrderResponse> getOrdersBySellerId(String sellerId, List<OrderStatusEnum> statuses);

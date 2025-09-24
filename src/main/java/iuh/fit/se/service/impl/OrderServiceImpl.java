@@ -204,10 +204,15 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResponse(savedOrder);
     }
 
+    public Order findOrderById(String orderId) {
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    }
     @Override
-    public OrderResponse findOrderById(String orderId) {
-        return orderMapper.toOrderResponse(orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND)));
+    public OrderResponse getOrderById(String orderId) {
+        log.info("Fetching order with ID: {}", orderId);
+        Order order = findOrderById(orderId);
+        return orderMapper.toOrderResponse(order);
     }
 
 

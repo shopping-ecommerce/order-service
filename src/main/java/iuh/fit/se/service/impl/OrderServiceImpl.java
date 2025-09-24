@@ -3,10 +3,7 @@ package iuh.fit.se.service.impl;
 import iuh.fit.event.dto.OrderCreatedEvent;
 import iuh.fit.event.dto.OrderItemPayload;
 import iuh.fit.event.dto.OrderStatusChangedEvent;
-import iuh.fit.se.dto.request.OrderRequest;
-import iuh.fit.se.dto.request.SearchSizeAndIDRequest;
-import iuh.fit.se.dto.request.SellerOrderUpdateRequest;
-import iuh.fit.se.dto.request.UserCancelRequest;
+import iuh.fit.se.dto.request.*;
 import iuh.fit.se.dto.response.*;
 import iuh.fit.se.entity.Order;
 import iuh.fit.se.entity.OrderItem;
@@ -30,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @RequiredArgsConstructor
@@ -206,9 +204,39 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResponse(savedOrder);
     }
 
-    private Order findOrderById(String orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    @Override
+    public OrderResponse findOrderById(String orderId) {
+        return orderMapper.toOrderResponse(orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND)));
+    }
+
+
+    @Override
+    public List<OrderResponse> getOrdersByUserId(String userId, List<OrderStatusEnum> statuses) {
+        log.info("Fetching orders for user ID: {} with statuses: {}", userId, statuses);
+        List<Order> orders;
+        if (statuses == null || statuses.isEmpty()) {
+            orders = orderRepository.findByUserIdOrderByCreatedTimeDesc(userId);
+        } else {
+            orders = orderRepository.findByUserIdAndStatusInOrderByCreatedTimeDesc(userId, statuses);
+        }
+        return orders.stream()
+                .map(orderMapper::toOrderResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderResponse> getOrdersBySellerId(String sellerId, List<OrderStatusEnum> statuses) {
+        log.info("Fetching orders for seller ID: {} with statuses: {}", sellerId, statuses);
+        List<Order> orders;
+        if (statuses == null || statuses.isEmpty()) {
+            orders = orderRepository.findBySellerIdOrderByCreatedTimeDesc(sellerId);
+        } else {
+            orders = orderRepository.findBySellerIdAndStatusInOrderByCreatedTimeDesc(sellerId, statuses);
+        }
+        return orders.stream()
+                .map(orderMapper::toOrderResponse)
+                .collect(Collectors.toList());
     }
 
     private void validateSellerStatusTransition(OrderStatusEnum currentStatus, OrderStatusEnum newStatus) {

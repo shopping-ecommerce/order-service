@@ -1,5 +1,6 @@
 package iuh.fit.se.dto.request;
 
+import iuh.fit.se.entity.enums.OrderStatusEnum;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,6 @@ import lombok.experimental.FieldDefaults;
 public class SellerOrderUpdateRequest {
      String orderId;
      String sellerId;
-     String status; // PROCESSING, SHIPPED, DELIVERED
+     OrderStatusEnum status;
      String reason; // Optional notes from seller
 }

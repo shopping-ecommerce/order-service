@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -35,5 +36,7 @@ public class OrderRequest {
     String recipientName;
 
     String notes;
+
+    BigDecimal discountAmount;
 
 }

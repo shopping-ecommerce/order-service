@@ -83,8 +83,13 @@ public class OrderServiceImpl implements OrderService {
                 .subtotal(items.stream()
                         .map(OrderItem::getTotalPrice)
                         .reduce(BigDecimal.ZERO, BigDecimal::add))
-                .discountAmount(BigDecimal.ZERO) // Add coupon logic if needed
-                .shippingFee(BigDecimal.ZERO) // Add shipping fee logic if needed
+                .discountAmount(request.getDiscountAmount()) // Add coupon logic if needed
+                .shippingFee(BigDecimal.valueOf(30000)) // Add shipping fee logic if needed
+                .totalAmount(items.stream()
+                        .map(OrderItem::getTotalPrice)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                        .add(BigDecimal.valueOf(30000))
+                        .subtract(request.getDiscountAmount() != null ? request.getDiscountAmount() : BigDecimal.ZERO))
                 .build();
 
         // Set order reference in OrderItems
@@ -167,7 +172,7 @@ public class OrderServiceImpl implements OrderService {
             throw new AppException(ErrorCode.SELLER_NOT_FOUND);
         }
 
-        OrderStatusEnum newStatus = OrderStatusEnum.valueOf(request.getStatus());
+        OrderStatusEnum newStatus = request.getStatus();
         validateSellerStatusTransition(order.getStatus(), newStatus);
 
         order.setStatus(newStatus);
@@ -247,14 +252,10 @@ public class OrderServiceImpl implements OrderService {
     private void validateSellerStatusTransition(OrderStatusEnum currentStatus, OrderStatusEnum newStatus) {
         Map<OrderStatusEnum, List<OrderStatusEnum>> allowedTransitions = Map.of(
                 OrderStatusEnum.PENDING, List.of(OrderStatusEnum.CONFIRMED, OrderStatusEnum.CANCELLED),
-                OrderStatusEnum.CONFIRMED, List.of(OrderStatusEnum.PROCESSING, OrderStatusEnum.CANCELLED),
-                OrderStatusEnum.PROCESSING, List.of(OrderStatusEnum.SHIPPED, OrderStatusEnum.CANCELLED),
-                OrderStatusEnum.SHIPPED, List.of(OrderStatusEnum.DELIVERED, OrderStatusEnum.RETURNED),
-                OrderStatusEnum.DELIVERED, List.of(OrderStatusEnum.RETURNED),
-                OrderStatusEnum.RETURNED, List.of(OrderStatusEnum.REFUNDED),
-                // CANCELLED, REFUNDED là trạng thái cuối, không thể chuyển sang trạng thái khác
-                OrderStatusEnum.CANCELLED, List.of(),
-                OrderStatusEnum.REFUNDED, List.of()
+                OrderStatusEnum.CONFIRMED, List.of(OrderStatusEnum.SHIPPED),
+                OrderStatusEnum.SHIPPED, List.of(OrderStatusEnum.DELIVERED),
+                OrderStatusEnum.DELIVERED, List.of(), // Final state, no transitions allowed
+                OrderStatusEnum.CANCELLED, List.of()  // Final state, no transitions allowed
         );
 
         List<OrderStatusEnum> allowed = allowedTransitions.get(currentStatus);

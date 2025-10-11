@@ -39,4 +39,5 @@ public class OrderRequest {
 
     BigDecimal discountAmount;
 
+    String voucherCode;
 }

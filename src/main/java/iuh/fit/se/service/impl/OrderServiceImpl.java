@@ -78,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
                 .shippingAddress(request.getShippingAddress())
                 .phoneNumber(request.getPhoneNumber())
                 .recipientName(request.getRecipientName())
+                .voucherCode(request.getVoucherCode())
                 .notes(request.getNotes())
                 .status(OrderStatusEnum.PENDING)
                 .subtotal(items.stream()
@@ -149,7 +150,7 @@ public class OrderServiceImpl implements OrderService {
                         .subTotal(i.getTotalPrice())
                         .unitPrice(i.getUnitPrice())
                         .build()).toList())
-                .subtotal(order.getSubtotal())
+                .subtotal(order.getTotalAmount())
                 .build());
         // Only allow cancellation if order is PENDING
         if (order.getStatus() != OrderStatusEnum.PENDING) {
@@ -203,7 +204,7 @@ public class OrderServiceImpl implements OrderService {
                         .subTotal(i.getTotalPrice())
                         .unitPrice(i.getUnitPrice())
                         .build()).toList())
-                .subtotal(savedOrder.getSubtotal())
+                .subtotal(savedOrder.getTotalAmount())
                 .build());
 
         return orderMapper.toOrderResponse(savedOrder);

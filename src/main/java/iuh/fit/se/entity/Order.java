@@ -39,6 +39,8 @@ public class Order {
     @Column(name = "discount_amount", precision = 19, scale = 2)
     BigDecimal discountAmount;
 
+    String voucherCode;
+
     @Column(name = "shipping_fee", precision = 19, scale = 2)
     BigDecimal shippingFee;
 

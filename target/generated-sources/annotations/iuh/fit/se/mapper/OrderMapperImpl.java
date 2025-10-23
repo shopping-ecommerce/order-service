@@ -76,6 +76,8 @@ public class OrderMapperImpl implements OrderMapper {
         order.orderItems( orderItemRequestListToOrderItemList( orderRequest.getItems() ) );
         order.userId( orderRequest.getUserId() );
         order.sellerId( orderRequest.getSellerId() );
+        order.discountAmount( orderRequest.getDiscountAmount() );
+        order.voucherCode( orderRequest.getVoucherCode() );
         order.shippingAddress( orderRequest.getShippingAddress() );
         order.phoneNumber( orderRequest.getPhoneNumber() );
         order.recipientName( orderRequest.getRecipientName() );

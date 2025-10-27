@@ -7,7 +7,9 @@ import iuh.fit.se.dto.response.OrderResponse;
 import iuh.fit.se.entity.Order;
 import iuh.fit.se.entity.OrderItem;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
@@ -58,7 +60,10 @@ public class OrderMapperImpl implements OrderMapper {
         orderItemResponse.productId( orderItem.getProductId() );
         orderItemResponse.productName( orderItem.getProductName() );
         orderItemResponse.quantity( orderItem.getQuantity() );
-        orderItemResponse.size( orderItem.getSize() );
+        Map<String, String> map = orderItem.getOptions();
+        if ( map != null ) {
+            orderItemResponse.options( new LinkedHashMap<String, String>( map ) );
+        }
         orderItemResponse.unitPrice( orderItem.getUnitPrice() );
         orderItemResponse.totalPrice( orderItem.getTotalPrice() );
 
@@ -95,8 +100,10 @@ public class OrderMapperImpl implements OrderMapper {
         OrderItem.OrderItemBuilder orderItem = OrderItem.builder();
 
         orderItem.productId( orderItemRequest.getProductId() );
-        orderItem.size( orderItemRequest.getSize() );
-        orderItem.color( orderItemRequest.getColor() );
+        Map<String, String> map = orderItemRequest.getOptions();
+        if ( map != null ) {
+            orderItem.options( new LinkedHashMap<String, String>( map ) );
+        }
         orderItem.quantity( orderItemRequest.getQuantity() );
 
         return orderItem.build();

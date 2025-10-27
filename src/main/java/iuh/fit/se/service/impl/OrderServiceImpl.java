@@ -46,12 +46,12 @@ public class OrderServiceImpl implements OrderService {
                 .map(reqItem -> {
                     ApiResponse<OrderItemProductResponse> productInfo = productClient.searchBySizeAndID(
                             SearchSizeAndIDRequest.builder()
-                                    .size(reqItem.getSize())
+                                    .options(reqItem.getOptions())
                                     .id(reqItem.getProductId())
                                     .build()
                     );
                     if (productInfo == null || productInfo.getResult() == null) {
-                        throw new RuntimeException("Product not found for ID: " + reqItem.getProductId() + ", Size: " + reqItem.getSize());
+                        throw new RuntimeException("Product not found for ID: " + reqItem.getProductId() + ", Option: " + reqItem.getOptions());
                     }
                     OrderItemProductResponse product = productInfo.getResult();
                     if (!product.getAvailable() || product.getStock() < reqItem.getQuantity()) {
@@ -60,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
 
                     return OrderItem.builder()
                             .productId(product.getProductId())
-                            .size(product.getSize())
+                            .options(reqItem.getOptions())
                             .quantity(reqItem.getQuantity())
                             .totalPrice(product.getPrice().multiply(BigDecimal.valueOf(reqItem.getQuantity())))
                             .productName(product.getName())
@@ -112,7 +112,8 @@ public class OrderServiceImpl implements OrderService {
                         .totalAmount(savedOrder.getTotalAmount())
                         .items(savedOrder.getOrderItems().stream().map(i -> OrderItemPayload.builder()
                                 .productId(i.getProductId())
-                                .size(i.getSize())
+//                                .size(i.getSize())
+                                .options(i.getOptions())
                                 .quantity(i.getQuantity())
                                 .productName(i.getProductName())
                                 .subTotal(i.getTotalPrice())
@@ -150,7 +151,8 @@ public class OrderServiceImpl implements OrderService {
                 .sellerId(order.getSellerId())
                 .items(order.getOrderItems().stream().map(i -> OrderItemPayload.builder()
                         .productId(i.getProductId())
-                        .size(i.getSize())
+//                        .size(i.getSize())
+                        .options(i.getOptions())
                         .quantity(i.getQuantity())
                         .productName(i.getProductName())
                         .subTotal(i.getTotalPrice())
@@ -207,7 +209,8 @@ public class OrderServiceImpl implements OrderService {
                         .shippingFee(savedOrder.getShippingFee())
                 .items(savedOrder.getOrderItems().stream().map(i -> OrderItemPayload.builder()
                         .productId(i.getProductId())
-                        .size(i.getSize())
+//                        .size(i.getSize())
+                        .options(i.getOptions())
                         .quantity(i.getQuantity())
                         .productName(i.getProductName())
                         .subTotal(i.getTotalPrice())

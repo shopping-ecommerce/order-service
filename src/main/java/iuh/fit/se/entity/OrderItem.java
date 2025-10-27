@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -31,11 +32,11 @@ public class OrderItem {
     @Column(name = "product_image")
     String productImage;
 
-    @Column(name = "size")
-    String size;
-
-    @Column(name = "color")
-    String color;
+    @ElementCollection
+    @CollectionTable(name = "order_item_options", joinColumns = @JoinColumn(name = "order_item_id"))
+    @MapKeyColumn(name = "option_key")
+    @Column(name = "option_value")
+    Map<String, String> options;
 
     @Column(name = "unit_price", precision = 19, scale = 2)
     BigDecimal unitPrice;

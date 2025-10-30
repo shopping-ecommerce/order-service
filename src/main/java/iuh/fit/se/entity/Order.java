@@ -75,7 +75,6 @@ public class Order {
     @PrePersist
     void prePersist() {
         this.status = OrderStatusEnum.PENDING;
-        this.paymentStatus = PaymentStatusEnum.CASH_ON_DELIVERY;
         this.createdTime = LocalDateTime.now();
         this.modifiedTime = LocalDateTime.now();
     }

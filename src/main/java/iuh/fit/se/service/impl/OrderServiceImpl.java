@@ -8,6 +8,7 @@ import iuh.fit.se.dto.response.*;
 import iuh.fit.se.entity.Order;
 import iuh.fit.se.entity.OrderItem;
 import iuh.fit.se.entity.enums.OrderStatusEnum;
+import iuh.fit.se.entity.enums.PaymentStatusEnum;
 import iuh.fit.se.exception.AppException;
 import iuh.fit.se.exception.ErrorCode;
 import iuh.fit.se.mapper.OrderMapper;
@@ -77,6 +78,7 @@ public class OrderServiceImpl implements OrderService {
                 .userId(request.getUserId())
                 .shippingAddress(request.getShippingAddress())
                 .phoneNumber(request.getPhoneNumber())
+                .paymentStatus(request.getPaymentStatus())
                 .recipientName(request.getRecipientName())
                 .voucherCode(request.getVoucherCode())
                 .notes(request.getNotes())

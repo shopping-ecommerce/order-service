@@ -1,6 +1,6 @@
 package iuh.fit.se.dto.request;
 
-import iuh.fit.se.entity.enums.PaymentMethodEnum;
+import iuh.fit.se.entity.enums.PaymentStatusEnum;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -22,8 +22,8 @@ public class OrderRequest {
     @NotEmpty(message = "Order items cannot be empty")
     List<OrderItemRequest> items;
 
-    @NotNull(message = "Payment method is required")
-    PaymentMethodEnum paymentMethod;
+    @NotNull(message = "Payment status is required")
+    PaymentStatusEnum paymentStatus;
 
     @NotBlank(message = "Shipping address is required")
     String shippingAddress;

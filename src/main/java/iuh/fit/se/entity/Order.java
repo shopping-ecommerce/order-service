@@ -1,7 +1,6 @@
 package iuh.fit.se.entity;
 
 import iuh.fit.se.entity.enums.OrderStatusEnum;
-import iuh.fit.se.entity.enums.PaymentMethodEnum;
 import iuh.fit.se.entity.enums.PaymentStatusEnum;
 import jakarta.persistence.*;
 import lombok.*;

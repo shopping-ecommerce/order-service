@@ -1,7 +1,6 @@
 package iuh.fit.se.dto.response;
 
 import iuh.fit.se.entity.enums.OrderStatusEnum;
-import iuh.fit.se.entity.enums.PaymentMethodEnum;
 import iuh.fit.se.entity.enums.PaymentStatusEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

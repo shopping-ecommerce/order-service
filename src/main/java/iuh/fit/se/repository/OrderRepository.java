@@ -2,6 +2,8 @@ package iuh.fit.se.repository;
 
 import iuh.fit.se.entity.Order;
 import iuh.fit.se.entity.enums.OrderStatusEnum;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -173,4 +175,7 @@ public interface OrderRepository extends JpaRepository<Order,String> {
     @Query("SELECT COUNT(o) FROM Order o " +
             "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
     Long countDELIVEREDOrdersBySeller(@Param("sellerId") String sellerId);
+
+    Page<Order> findByCreatedTimeBefore(LocalDateTime cutoff, Pageable pageable);
+    long deleteByCreatedTimeBefore(LocalDateTime cutoff);
 }

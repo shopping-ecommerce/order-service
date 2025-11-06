@@ -30,6 +30,6 @@ public class OrderStatusChangedEvent {
     String shippingAddress;
     String reason;
     LocalDateTime createdAt;
-
+    String paymentMethod;
     List<OrderItemPayload> items;
 }

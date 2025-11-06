@@ -161,6 +161,7 @@ public class OrderServiceImpl implements OrderService {
                         .unitPrice(i.getUnitPrice())
                         .build()).toList())
                 .subtotal(order.getTotalAmount())
+                .paymentMethod(order.getPaymentStatus().toString())
                 .build());
         // Only allow cancellation if order is PENDING
         if (order.getStatus() != OrderStatusEnum.PENDING) {
@@ -219,6 +220,7 @@ public class OrderServiceImpl implements OrderService {
                         .unitPrice(i.getUnitPrice())
                         .build()).toList())
                 .subtotal(savedOrder.getTotalAmount())
+                .paymentMethod(order.getPaymentStatus().toString())
                 .build());
 
         return orderMapper.toOrderResponse(savedOrder);

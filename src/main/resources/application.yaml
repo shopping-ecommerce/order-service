@@ -43,6 +43,9 @@ order:
     months-before-deletion: 12
     cron: "0 0 2 * * MON"
     batch-size: 100
+
+internal:
+  service-token: ${SERVICE_TOKEN:}
 logging:
   level:
     iuh.fit.se.service.impl: DEBUG

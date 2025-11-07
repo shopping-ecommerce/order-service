@@ -5,6 +5,7 @@ import iuh.fit.se.entity.enums.OrderStatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -178,4 +179,25 @@ public interface OrderRepository extends JpaRepository<Order,String> {
 
     Page<Order> findByCreatedTimeBefore(LocalDateTime cutoff, Pageable pageable);
     long deleteByCreatedTimeBefore(LocalDateTime cutoff);
+
+    // Lấy tất cả đơn PENDING tạo trước cutoff (dùng cho rule 4 ngày từ created_time)
+    List<Order> findByStatusAndCreatedTimeBefore(OrderStatusEnum status, LocalDateTime cutoff);
+
+    // Lấy tất cả đơn CONFIRMED tạo trước cutoff (dùng cho rule 8 ngày từ created_time)
+    List<Order> findByStatusAndCreatedTimeBefore(OrderStatusEnum status, LocalDateTime cutoff, org.springframework.data.domain.Sort sort);
+    // Gợi ý: có thể truyền Sort.by("createdTime").ascending() nếu bạn muốn xử lý theo thứ tự
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           UPDATE Order o
+              SET o.status = :newStatus,
+                  o.cancelledReason = :reason,
+                  o.modifiedTime = CURRENT_TIMESTAMP
+            WHERE o.status = :matchStatus
+              AND o.createdTime < :cutoff
+           """)
+    int bulkCancelTimeoutOrders(@Param("matchStatus") OrderStatusEnum matchStatus,
+                                @Param("cutoff") LocalDateTime cutoff,
+                                @Param("newStatus") OrderStatusEnum newStatus,
+                                @Param("reason") String reason);
+
 }

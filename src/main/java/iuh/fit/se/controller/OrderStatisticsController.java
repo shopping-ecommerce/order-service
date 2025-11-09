@@ -38,9 +38,9 @@ public class OrderStatisticsController {
         log.info("GET /order-statistics/seller/{} - startDate: {}, endDate: {}",
                 sellerId, startDate, endDate);
 
-        // Default: 30 ngày gần nhất
+        // Default: 7 ngày gần nhất
         if (startDate == null) {
-            startDate = LocalDate.now().minusDays(30);
+            startDate = LocalDate.now().minusDays(7);
         }
         if (endDate == null) {
             endDate = LocalDate.now();
@@ -74,7 +74,7 @@ public class OrderStatisticsController {
 
         // Default: 30 ngày gần nhất
         if (startDate == null) {
-            startDate = LocalDate.now().minusDays(30);
+            startDate = LocalDate.now().minusDays(7);
         }
         if (endDate == null) {
             endDate = LocalDate.now();

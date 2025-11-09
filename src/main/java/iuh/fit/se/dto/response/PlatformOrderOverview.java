@@ -16,5 +16,5 @@ public class PlatformOrderOverview {
     BigDecimal totalCommission;
     Long totalOrders;
     Long activeSellers; // Có đơn hàng trong 30 ngày
-    Double averageOrderValue;
+//    Double averageOrderValue;
 }

@@ -11,9 +11,8 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RevenueStats {
-    BigDecimal totalRevenue;
     BigDecimal todayRevenue;
     BigDecimal monthRevenue;
-    BigDecimal averageOrderValue;
+//    BigDecimal averageOrderValue;
     Double revenueGrowthRate; // % so với tháng trước
 }

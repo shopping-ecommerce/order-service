@@ -269,7 +269,7 @@ public class OrderServiceImpl implements OrderService {
     private void validateSellerStatusTransition(OrderStatusEnum currentStatus, OrderStatusEnum newStatus) {
         Map<OrderStatusEnum, List<OrderStatusEnum>> allowedTransitions = Map.of(
                 OrderStatusEnum.PENDING, List.of(OrderStatusEnum.CONFIRMED, OrderStatusEnum.CANCELLED),
-                OrderStatusEnum.CONFIRMED, List.of(OrderStatusEnum.SHIPPED),
+                OrderStatusEnum.CONFIRMED, List.of(OrderStatusEnum.SHIPPED,OrderStatusEnum.CANCELLED),
                 OrderStatusEnum.SHIPPED, List.of(OrderStatusEnum.DELIVERED),
                 OrderStatusEnum.DELIVERED, List.of(), // Final state, no transitions allowed
                 OrderStatusEnum.CANCELLED, List.of()  // Final state, no transitions allowed

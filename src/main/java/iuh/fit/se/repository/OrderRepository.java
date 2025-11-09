@@ -5,6 +5,7 @@ import iuh.fit.se.entity.enums.OrderStatusEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -28,9 +29,9 @@ public interface OrderRepository extends JpaRepository<Order,String> {
     /**
      * Tổng doanh thu của seller (chỉ tính đơn DELIVERED)
      */
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o " +
-            "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
-    BigDecimal calculateTotalRevenueBySeller(@Param("sellerId") String sellerId);
+//    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o " +
+//            "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
+//    BigDecimal calculateTotalRevenueBySeller(@Param("sellerId") String sellerId);
 
     /**
      * Doanh thu theo khoảng thời gian
@@ -57,9 +58,9 @@ public interface OrderRepository extends JpaRepository<Order,String> {
     /**
      * Giá trị đơn hàng trung bình
      */
-    @Query("SELECT AVG(o.totalAmount) FROM Order o " +
-            "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
-    BigDecimal calculateAverageOrderValue(@Param("sellerId") String sellerId);
+//    @Query("SELECT AVG(o.totalAmount) FROM Order o " +
+//            "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
+//    BigDecimal calculateAverageOrderValue(@Param("sellerId") String sellerId);
 
     /**
      * Doanh thu theo ngày (cho biểu đồ)
@@ -100,12 +101,12 @@ public interface OrderRepository extends JpaRepository<Order,String> {
 
     // ==================== ADMIN STATISTICS ====================
 
-    /**
-     * Tổng GMV (Gross Merchandise Value) - toàn platform
-     */
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o " +
-            "WHERE o.status = 'DELIVERED'")
-    BigDecimal calculateTotalGMV();
+//    /**
+//     * Tổng GMV (Gross Merchandise Value) - toàn platform
+//     */
+//    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o " +
+//            "WHERE o.status = 'DELIVERED'")
+//    BigDecimal calculateTotalGMV();
 
     /**
      * GMV theo khoảng thời gian
@@ -121,28 +122,53 @@ public interface OrderRepository extends JpaRepository<Order,String> {
     /**
      * Tổng số đơn hàng toàn platform
      */
-    @Query("SELECT COUNT(o) FROM Order o")
-    Long countTotalOrders();
+//    @Query("SELECT COUNT(o) FROM Order o")
+//    Long countTotalOrders();
+    @Query("""
+           SELECT COUNT(o)
+             FROM Order o
+            WHERE o.createdTime BETWEEN :startDate AND :endDate
+           """)
+    Long countTotalOrdersBetween(@Param("startDate") LocalDateTime startDate,
+                                 @Param("endDate") LocalDateTime endDate);
 
     /**
      * Đếm đơn hàng theo status (admin)
      */
-    Long countByStatus(OrderStatusEnum status);
-
+//    Long countByStatus(OrderStatusEnum status);
+    @Query("""
+           SELECT o.status, COUNT(o)
+             FROM Order o
+            WHERE o.createdTime BETWEEN :startDate AND :endDate
+         GROUP BY o.status
+           """)
+    List<Object[]> countByStatusBetween(@Param("startDate") LocalDateTime startDate,
+                                        @Param("endDate") LocalDateTime endDate);
     /**
      * Top sellers theo doanh thu
      * Trả về: sellerId, totalRevenue, totalOrders
      */
-    @Query("SELECT o.sellerId, " +
-            "COALESCE(SUM(o.totalAmount), 0) as revenue, " +
-            "COUNT(o) as orderCount " +
-            "FROM Order o " +
-            "WHERE o.status = 'DELIVERED' " +
-            "AND o.createdTime >= :startDate " +
-            "GROUP BY o.sellerId " +
-            "ORDER BY COALESCE(SUM(o.totalAmount), 0) DESC")
-    List<Object[]> findTopSellersByRevenue(@Param("startDate") LocalDateTime startDate);
-
+//    @Query("SELECT o.sellerId, " +
+//            "COALESCE(SUM(o.totalAmount), 0) as revenue, " +
+//            "COUNT(o) as orderCount " +
+//            "FROM Order o " +
+//            "WHERE o.status = 'DELIVERED' " +
+//            "AND o.createdTime >= :startDate " +
+//            "GROUP BY o.sellerId " +
+//            "ORDER BY COALESCE(SUM(o.totalAmount), 0) DESC")
+//    List<Object[]> findTopSellersByRevenue(@Param("startDate") LocalDateTime startDate);
+    @Query("""
+           SELECT o.sellerId,
+                  COALESCE(SUM(o.totalAmount), 0) as revenue,
+                  COUNT(o) as orderCount
+             FROM Order o
+            WHERE o.status = 'DELIVERED'
+              AND o.createdTime BETWEEN :startDate AND :endDate
+         GROUP BY o.sellerId
+         ORDER BY revenue DESC
+           """)
+    List<Object[]> findTopSellersByRevenueBetween(@Param("startDate") LocalDateTime startDate,
+                                                  @Param("endDate") LocalDateTime endDate);
     @Query("SELECT CAST(o.createdTime AS LocalDate) as date, " +
             "COALESCE(SUM(o.totalAmount), 0) as revenue, " +
             "COUNT(o) as orderCount " +
@@ -172,10 +198,40 @@ public interface OrderRepository extends JpaRepository<Order,String> {
     /**
      * Đếm đơn DELIVERED của seller (dùng cho completion rate)
      */
-    @Query("SELECT COUNT(o) FROM Order o " +
-            "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
-    Long countDELIVEREDOrdersBySeller(@Param("sellerId") String sellerId);
-
+//    @Query("SELECT COUNT(o) FROM Order o " +
+//            "WHERE o.sellerId = :sellerId AND o.status = 'DELIVERED'")
+//    Long countDELIVEREDOrdersBySeller(@Param("sellerId") String sellerId);
+    @Query("""
+           SELECT COUNT(o)
+             FROM Order o
+            WHERE o.sellerId = :sellerId
+              AND o.status = 'DELIVERED'
+              AND o.createdTime BETWEEN :startDate AND :endDate
+           """)
+    Long countDELIVEREDOrdersBySellerBetween(@Param("sellerId") String sellerId,
+                                             @Param("startDate") LocalDateTime startDate,
+                                             @Param("endDate") LocalDateTime endDate);
     Page<Order> findByCreatedTimeBefore(LocalDateTime cutoff, Pageable pageable);
     long deleteByCreatedTimeBefore(LocalDateTime cutoff);
+
+    // Lấy tất cả đơn PENDING tạo trước cutoff (dùng cho rule 4 ngày từ created_time)
+    List<Order> findByStatusAndCreatedTimeBefore(OrderStatusEnum status, LocalDateTime cutoff);
+
+    // Lấy tất cả đơn CONFIRMED tạo trước cutoff (dùng cho rule 8 ngày từ created_time)
+    List<Order> findByStatusAndCreatedTimeBefore(OrderStatusEnum status, LocalDateTime cutoff, org.springframework.data.domain.Sort sort);
+    // Gợi ý: có thể truyền Sort.by("createdTime").ascending() nếu bạn muốn xử lý theo thứ tự
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+           UPDATE Order o
+              SET o.status = :newStatus,
+                  o.cancelledReason = :reason,
+                  o.modifiedTime = CURRENT_TIMESTAMP
+            WHERE o.status = :matchStatus
+              AND o.createdTime < :cutoff
+           """)
+    int bulkCancelTimeoutOrders(@Param("matchStatus") OrderStatusEnum matchStatus,
+                                @Param("cutoff") LocalDateTime cutoff,
+                                @Param("newStatus") OrderStatusEnum newStatus,
+                                @Param("reason") String reason);
+
 }

@@ -15,5 +15,6 @@ public class OrderDistribution {
     Long shipping;
     Long completed;
     Long cancelled;
+    Long confirmed;
     Map<String, Long> ordersByStatus;
 }

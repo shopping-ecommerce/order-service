@@ -37,12 +37,19 @@ spring:
             url: ${FEIGN_USER:http://user-service:8082/info}
             connect-timeout: 30000
             read-timeout: 60000
+          policy-service:
+            url: ${FEIGN_POLICY:http://policy-service:8091/policy}
+            connect-timeout: 30000
+            read-timeout: 60000
 order:
   cleanup:
     enabled: true
     months-before-deletion: 12
     cron: "0 0 2 * * MON"
     batch-size: 100
+
+internal:
+  service-token: ${SERVICE_TOKEN:}
 logging:
   level:
     iuh.fit.se.service.impl: DEBUG

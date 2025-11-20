@@ -80,7 +80,8 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(1047, "Category not found", HttpStatus.NOT_FOUND),
     ORDER_NOT_FOUND(1048, "Order not found", HttpStatus.NOT_FOUND),
     ORDER_CANNOT_BE_CANCELLED(1049, "Order cannot be cancelled at this stage", HttpStatus.BAD_REQUEST),
-    INVALID_ORDER_STATUS_TRANSITION(1050, "Invalid order status transition", HttpStatus.BAD_REQUEST),;
+    INVALID_ORDER_STATUS_TRANSITION(1050, "Invalid order status transition", HttpStatus.BAD_REQUEST),
+    USER_BLOCKED_FROM_ORDERING(1051, "User is blocked from placing orders", HttpStatus.FORBIDDEN);
 
     int code;
     String message;

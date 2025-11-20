@@ -43,6 +43,10 @@ public class OrderServiceImpl implements OrderService {
     KafkaTemplate<String, Object> kafkaTemplate;
     @Override
     public OrderResponse create(OrderRequest request) {
+        if(!userClient.canOrder(request.getUserId()).getResult()){
+            log.info("User {} is blocked from ordering", request.getUserId());
+            throw new AppException(ErrorCode.USER_BLOCKED_FROM_ORDERING);
+        }
         List<OrderItem> items = request.getItems().stream()
                 .map(reqItem -> {
                     ApiResponse<OrderItemProductResponse> productInfo = productClient.searchBySizeAndID(
